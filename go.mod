@@ -5,7 +5,7 @@ go 1.22.0
 require (
 	github.com/charmbracelet/lipgloss v0.12.1
 	github.com/gorilla/css v1.0.1
-	github.com/jordanella/go-ansi-paintbrush v0.0.0-20240728051830-f1271ad106e9
+	github.com/jordanella/go-ansi-paintbrush v0.0.0-20240728195301-b7ad996ecf3d
 	golang.org/x/net v0.27.0
 )
 

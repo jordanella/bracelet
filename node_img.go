@@ -8,26 +8,27 @@ import (
 
 type ImgNode struct {
 	Element
-	paintbrush  paintbrush.AnsiArtInterface
+	canvas      *paintbrush.Canvas
 	file_loaded bool
 	updated     bool
 }
 
 func (n ImgNode) Create() NodeFactory {
-	paintbrush := paintbrush.New()
+	canvas := paintbrush.New()
 
 	return func(tag string) Node {
 		return &ImgNode{
-			Element:    NewElement(tag),
-			paintbrush: paintbrush,
+			Element: NewElement(tag),
+			canvas:  canvas,
 		}
 	}
+
 }
 
 func (n *ImgNode) SetAttribute(attr string, value string) {
 	triggerAttributes := map[string]func(){
-		"src":  func() { n.file_loaded = n.paintbrush.LoadImage(value) == nil },
-		"font": func() { _ = n.paintbrush.LoadFont(value) },
+		"src":  func() { n.file_loaded = n.canvas.LoadImage(value) == nil },
+		"font": func() { _ = n.canvas.LoadFont(value) },
 	}
 	if action, isTrigger := triggerAttributes[attr]; isTrigger {
 		if n.GetAttribute(attr) != value {
@@ -40,7 +41,8 @@ func (n *ImgNode) SetAttribute(attr string, value string) {
 
 func (n *ImgNode) SetProperty(attr string, value string) {
 	triggerProperties := map[string]struct{}{
-		"width": {},
+		"width":  {},
+		"height": {},
 	}
 	if _, isTrigger := triggerProperties[attr]; isTrigger {
 		if n.GetProperty(attr) != value {
@@ -52,12 +54,14 @@ func (n *ImgNode) SetProperty(attr string, value string) {
 
 func (n *ImgNode) ConvertImage() {
 	width, _ := strconv.Atoi(n.GetProperty("width"))
-	if !n.file_loaded || width == 0 {
+	height, _ := strconv.Atoi(n.GetProperty("height"))
+	if !n.file_loaded {
 		return
 	}
-	n.paintbrush.SetWidth(width)
-	n.paintbrush.Render()
-	result := n.paintbrush.GetResultRaw()
+	n.canvas.SetWidth(width)
+	n.canvas.SetHeight(height)
+	n.canvas.Paint()
+	result := n.canvas.GetResult()
 	n.SetContent(result)
 	n.updated = true
 }

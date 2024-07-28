@@ -13,63 +13,63 @@ type PropertyFunction func(string, lipgloss.Style) (string, lipgloss.Style)
 // Each PropertyFunction takes a property value as input and returns a function
 // that applies that property to a node's content and style.
 var PropertyFunctions = map[string]func(string) PropertyFunction{
-	"color":            AttrColor,
-	"background-color": AttrBackgroundColor,
-	"font-weight":      AttrFontWeight,
-	"text-transform":   AttrTextTransform,
-	"font-style":       AttrFontStyle,
-	"text-decoration":  AttrTextDecoration,
-	"margin":           AttrMargin,
-	"margin-top":       AttrMarginTop,
-	"margin-bottom":    AttrMarginBottom,
-	"margin-left":      AttrMarginLeft,
-	"margin-right":     AttrMarginRight,
-	"padding":          AttrPadding,
-	"padding-top":      AttrPaddingTop,
-	"padding-bottom":   AttrPaddingBottom,
-	"padding-left":     AttrPaddingLeft,
-	"padding-right":    AttrPaddingRight,
-	"border":           AttrBorder,
-	"border-top":       AttrBorderTop,
-	"border-bottom":    AttrBorderBottom,
-	"border-left":      AttrBorderLeft,
-	"border-right":     AttrBorderRight,
-	"width":            AttrWidth,
-	"height":           AttrHeight,
-	"text-align":       AttrTextAlign,
-	"vertical-align":   AttrVerticalAlign,
-	"indent":           AttrIndent,
-	"text-indent":      AttrIndent,
-	"word-spacing":     AttrWordSpacing,
+	"color":            PropColor,
+	"background-color": PropBackgroundColor,
+	"font-weight":      PropFontWeight,
+	"text-transform":   PropTextTransform,
+	"font-style":       PropFontStyle,
+	"text-decoration":  PropTextDecoration,
+	"margin":           PropMargin,
+	"margin-top":       PropMarginTop,
+	"margin-bottom":    PropMarginBottom,
+	"margin-left":      PropMarginLeft,
+	"margin-right":     PropMarginRight,
+	"padding":          PropPadding,
+	"padding-top":      PropPaddingTop,
+	"padding-bottom":   PropPaddingBottom,
+	"padding-left":     PropPaddingLeft,
+	"padding-right":    PropPaddingRight,
+	"border":           PropBorder,
+	"border-top":       PropBorderTop,
+	"border-bottom":    PropBorderBottom,
+	"border-left":      PropBorderLeft,
+	"border-right":     PropBorderRight,
+	"width":            PropWidth,
+	"height":           PropHeight,
+	"text-align":       PropTextAlign,
+	"vertical-align":   PropVerticalAlign,
+	"indent":           PropIndent,
+	"text-indent":      PropIndent,
+	"word-spacing":     PropWordSpacing,
 }
 
 // ApplyProperty looks up the appropriate PropertyFunction and applies it to a node's content and style.
 // If the property is not recognized, no changes are made to the Node.
 func ApplyProperty(node *Node, property string, value string) {
-	if attrFunc, ok := PropertyFunctions[property]; ok {
-		content, style := attrFunc(value)((*node).GetContent(), (*node).GetStyle())
+	if propFunc, ok := PropertyFunctions[property]; ok {
+		content, style := propFunc(value)((*node).GetContent(), (*node).GetStyle())
 		(*node).SetContent(content)
 		(*node).SetStyle(style)
 	}
 }
 
-// AttrColor returns a PropertyFunction that sets the foreground color of the text.
-func AttrColor(value string) PropertyFunction {
+// PropColor returns a PropertyFunction that sets the foreground color of the text.
+func PropColor(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		return content, style.Foreground(lipgloss.Color(value))
 	}
 }
 
-// AttrBackgroundColor returns a PropertyFunction that sets the background color of the text.
-func AttrBackgroundColor(value string) PropertyFunction {
+// PropBackgroundColor returns a PropertyFunction that sets the background color of the text.
+func PropBackgroundColor(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		return content, style.Background(lipgloss.Color(value))
 	}
 }
 
-// AttrFontWeight returns a PropertyFunction that sets the font weight.
+// PropFontWeight returns a PropertyFunction that sets the font weight.
 // Currently, it only supports making text bold.
-func AttrFontWeight(value string) PropertyFunction {
+func PropFontWeight(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		if value == "bold" {
 			return content, style.Bold(true)
@@ -78,9 +78,9 @@ func AttrFontWeight(value string) PropertyFunction {
 	}
 }
 
-// AttrTextTransform returns a PropertyFunction that transforms the text content.
+// PropTextTransform returns a PropertyFunction that transforms the text content.
 // Supports uppercase, lowercase, and capitalize.
-func AttrTextTransform(value string) PropertyFunction {
+func PropTextTransform(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		switch value {
 		case "uppercase":
@@ -95,9 +95,9 @@ func AttrTextTransform(value string) PropertyFunction {
 	}
 }
 
-// AttrFontStyle returns a PropertyFunction that sets the font style.
+// PropFontStyle returns a PropertyFunction that sets the font style.
 // Supports italic and bold.
-func AttrFontStyle(value string) PropertyFunction {
+func PropFontStyle(value string) PropertyFunction {
 	var italic, bold, normal bool
 	values := strings.Split(value, " ")
 	for _, val := range values {
@@ -126,9 +126,9 @@ func AttrFontStyle(value string) PropertyFunction {
 	}
 }
 
-// AttrTextDecoration returns a PropertyFunction that sets text decoration.
+// PropTextDecoration returns a PropertyFunction that sets text decoration.
 // Supports underline and line-through.
-func AttrTextDecoration(value string) PropertyFunction {
+func PropTextDecoration(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		switch value {
 		case "underline":
@@ -141,9 +141,9 @@ func AttrTextDecoration(value string) PropertyFunction {
 	}
 }
 
-// AttrMargin returns a PropertyFunction that sets all margins.
+// PropMargin returns a PropertyFunction that sets all margins.
 // Accepts up to four space-separated values.
-func AttrMargin(value string) PropertyFunction {
+func PropMargin(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		parts := strings.Fields(value)
 		var values []int
@@ -156,8 +156,8 @@ func AttrMargin(value string) PropertyFunction {
 	}
 }
 
-// AttrMarginLeft returns a PropertyFunction that sets the left margin.
-func AttrMarginLeft(value string) PropertyFunction {
+// PropMarginLeft returns a PropertyFunction that sets the left margin.
+func PropMarginLeft(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		if v, err := strconv.Atoi(strings.TrimSpace(value)); err == nil {
 			return content, style.MarginLeft(v)
@@ -166,8 +166,8 @@ func AttrMarginLeft(value string) PropertyFunction {
 	}
 }
 
-// AttrMarginRight returns a PropertyFunction that sets the right margin.
-func AttrMarginRight(value string) PropertyFunction {
+// PropMarginRight returns a PropertyFunction that sets the right margin.
+func PropMarginRight(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		if v, err := strconv.Atoi(strings.TrimSpace(value)); err == nil {
 			return content, style.MarginRight(v)
@@ -176,8 +176,8 @@ func AttrMarginRight(value string) PropertyFunction {
 	}
 }
 
-// AttrMarginTop returns a PropertyFunction that sets the top margin.
-func AttrMarginTop(value string) PropertyFunction {
+// PropMarginTop returns a PropertyFunction that sets the top margin.
+func PropMarginTop(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		if v, err := strconv.Atoi(strings.TrimSpace(value)); err == nil {
 			return content, style.MarginTop(v)
@@ -186,8 +186,8 @@ func AttrMarginTop(value string) PropertyFunction {
 	}
 }
 
-// AttrMarginBottom returns a PropertyFunction that sets the bottom margin.
-func AttrMarginBottom(value string) PropertyFunction {
+// PropMarginBottom returns a PropertyFunction that sets the bottom margin.
+func PropMarginBottom(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		if v, err := strconv.Atoi(strings.TrimSpace(value)); err == nil {
 			return content, style.MarginBottom(v)
@@ -196,9 +196,9 @@ func AttrMarginBottom(value string) PropertyFunction {
 	}
 }
 
-// AttrPadding returns a PropertyFunction that sets all padding.
+// PropPadding returns a PropertyFunction that sets all padding.
 // Accepts up to four space-separated values.
-func AttrPadding(value string) PropertyFunction {
+func PropPadding(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		parts := strings.Fields(value)
 		var values []int
@@ -211,8 +211,8 @@ func AttrPadding(value string) PropertyFunction {
 	}
 }
 
-// AttrPaddingLeft returns a PropertyFunction that sets the left padding.
-func AttrPaddingLeft(value string) PropertyFunction {
+// PropPaddingLeft returns a PropertyFunction that sets the left padding.
+func PropPaddingLeft(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		if v, err := strconv.Atoi(strings.TrimSpace(value)); err == nil {
 			return content, style.PaddingLeft(v)
@@ -221,8 +221,8 @@ func AttrPaddingLeft(value string) PropertyFunction {
 	}
 }
 
-// AttrPaddingRight returns a PropertyFunction that sets the right padding.
-func AttrPaddingRight(value string) PropertyFunction {
+// PropPaddingRight returns a PropertyFunction that sets the right padding.
+func PropPaddingRight(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		if v, err := strconv.Atoi(strings.TrimSpace(value)); err == nil {
 			return content, style.PaddingRight(v)
@@ -231,8 +231,8 @@ func AttrPaddingRight(value string) PropertyFunction {
 	}
 }
 
-// AttrPaddingTop returns a PropertyFunction that sets the top padding.
-func AttrPaddingTop(value string) PropertyFunction {
+// PropPaddingTop returns a PropertyFunction that sets the top padding.
+func PropPaddingTop(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		if v, err := strconv.Atoi(strings.TrimSpace(value)); err == nil {
 			return content, style.PaddingTop(v)
@@ -241,8 +241,8 @@ func AttrPaddingTop(value string) PropertyFunction {
 	}
 }
 
-// AttrPaddingBottom returns a PropertyFunction that sets the bottom padding.
-func AttrPaddingBottom(value string) PropertyFunction {
+// PropPaddingBottom returns a PropertyFunction that sets the bottom padding.
+func PropPaddingBottom(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		if v, err := strconv.Atoi(strings.TrimSpace(value)); err == nil {
 			return content, style.PaddingBottom(v)
@@ -306,9 +306,9 @@ func parseBorderArgs(args []string) (bool, lipgloss.Border, lipgloss.Color, lipg
 	return show, style, foreground, background
 }
 
-// AttrBorder returns a PropertyFunction that sets all borders.
+// PropBorder returns a PropertyFunction that sets all borders.
 // Accepts style, color, and width arguments.
-func AttrBorder(value string) PropertyFunction {
+func PropBorder(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		args := strings.Fields(value)
 		show, borderStyle, fg, bg := parseBorderArgs(args)
@@ -329,9 +329,9 @@ func AttrBorder(value string) PropertyFunction {
 	}
 }
 
-// AttrBorderTop returns a PropertyFunction that sets the top border.
+// PropBorderTop returns a PropertyFunction that sets the top border.
 // Accepts style, color, and width arguments.
-func AttrBorderTop(value string) PropertyFunction {
+func PropBorderTop(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		args := strings.Fields(value)
 		show, borderStyle, fg, bg := parseBorderArgs(args)
@@ -351,9 +351,9 @@ func AttrBorderTop(value string) PropertyFunction {
 	}
 }
 
-// AttrBorderBottom returns a PropertyFunction that sets the bottom border.
+// PropBorderBottom returns a PropertyFunction that sets the bottom border.
 // Accepts style, color, and width arguments.
-func AttrBorderBottom(value string) PropertyFunction {
+func PropBorderBottom(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		args := strings.Fields(value)
 		show, borderStyle, fg, bg := parseBorderArgs(args)
@@ -373,9 +373,9 @@ func AttrBorderBottom(value string) PropertyFunction {
 	}
 }
 
-// AttrBorderLeft returns a PropertyFunction that sets the left border.
+// PropBorderLeft returns a PropertyFunction that sets the left border.
 // Accepts style, color, and width arguments.
-func AttrBorderLeft(value string) PropertyFunction {
+func PropBorderLeft(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		args := strings.Fields(value)
 		show, borderStyle, fg, bg := parseBorderArgs(args)
@@ -395,9 +395,9 @@ func AttrBorderLeft(value string) PropertyFunction {
 	}
 }
 
-// AttrBorderRight returns a PropertyFunction that sets the right border.
+// PropBorderRight returns a PropertyFunction that sets the right border.
 // Accepts style, color, and width arguments.
-func AttrBorderRight(value string) PropertyFunction {
+func PropBorderRight(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		args := strings.Fields(value)
 		show, borderStyle, fg, bg := parseBorderArgs(args)
@@ -417,25 +417,25 @@ func AttrBorderRight(value string) PropertyFunction {
 	}
 }
 
-// AttrWidth returns a PropertyFunction that sets the width of the element.
-func AttrWidth(width string) PropertyFunction {
+// PropWidth returns a PropertyFunction that sets the width of the element.
+func PropWidth(width string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		w, _ := strconv.Atoi(width)
 		return content, style.Width(w)
 	}
 }
 
-// AttrHeight returns a PropertyFunction that sets the height of the element.
-func AttrHeight(height string) PropertyFunction {
+// PropHeight returns a PropertyFunction that sets the height of the element.
+func PropHeight(height string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		h, _ := strconv.Atoi(height)
 		return content, style.Height(h)
 	}
 }
 
-// AttrTextAlign returns a PropertyFunction that sets the horizontal text alignment.
+// PropTextAlign returns a PropertyFunction that sets the horizontal text alignment.
 // Supports left, center, and right.
-func AttrTextAlign(value string) PropertyFunction {
+func PropTextAlign(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		switch strings.ToLower(value) {
 		case "left":
@@ -450,9 +450,9 @@ func AttrTextAlign(value string) PropertyFunction {
 	}
 }
 
-// AttrVerticalAlign returns a PropertyFunction that sets the vertical alignment.
+// PropVerticalAlign returns a PropertyFunction that sets the vertical alignment.
 // Supports top, center, and bottom.
-func AttrVerticalAlign(value string) PropertyFunction {
+func PropVerticalAlign(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		switch strings.ToLower(value) {
 		case "top":
@@ -467,16 +467,16 @@ func AttrVerticalAlign(value string) PropertyFunction {
 	}
 }
 
-// AttrIndent returns a PropertyFunction that sets the text indentation.
-func AttrIndent(value string) PropertyFunction {
+// PropIndent returns a PropertyFunction that sets the text indentation.
+func PropIndent(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		indent, _ := strconv.Atoi(value)
 		return content, style.MarginLeft(style.GetMarginLeft() + indent)
 	}
 }
 
-// AttrWordSpacing returns a PropertyFunction that sets the spacing between words.
-func AttrWordSpacing(value string) PropertyFunction {
+// PropWordSpacing returns a PropertyFunction that sets the spacing between words.
+func PropWordSpacing(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
 		spacing, _ := strconv.Atoi(value)
 		content = strings.Join(strings.Split(content, " "), strings.Repeat(" ", spacing))

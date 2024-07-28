@@ -25,7 +25,7 @@ type Element struct {
 //
 // The final output is a string that represents the fully styled Element,
 // ready for display in a terminal interface.
-func (e Element) Serve() string {
+func (e *Element) Serve() string {
 	style := lipgloss.NewStyle()
 	content := e.GetContent()
 	for key, value := range e.GetProperties() {
@@ -166,7 +166,10 @@ func (e *Element) HasClass(class string) bool {
 }
 
 // SetAttributes sets all attributes for the node, replacing any existing attributes.
-func (n *Element) SetAttributes(attributes map[string]string) { n.Attributes = attributes }
+func (n *Element) SetAttributes(attributes map[string]string) {
+	n.Attributes = map[string]string{}
+	n.AddAttributes(attributes)
+}
 
 // SetAttribute sets a single attribute on the node. If the attribute already exists, its value is replaced.
 func (n *Element) SetAttribute(attr string, value string) {
@@ -176,7 +179,7 @@ func (n *Element) SetAttribute(attr string, value string) {
 // AddAttributes sets attributes for the node, adding to and updating existing attributes.
 func (n *Element) AddAttributes(attributes map[string]string) {
 	for key, value := range attributes {
-		n.Attributes[key] = value
+		n.SetAttribute(key, value)
 	}
 }
 
@@ -194,7 +197,10 @@ func (e *Element) HasAttribute(key string) bool {
 }
 
 // SetProperties sets all CSS properties for the node, replacing any existing properties.
-func (n *Element) SetProperties(properties map[string]string) { n.Properties = properties }
+func (n *Element) SetProperties(properties map[string]string) {
+	n.Properties = map[string]string{}
+	n.AddProperties(properties)
+}
 
 // SetProperty sets a single CSS property on the node. If the property already exists, its value is replaced.
 func (n *Element) SetProperty(prop string, value string) {
@@ -204,7 +210,7 @@ func (n *Element) SetProperty(prop string, value string) {
 // AddProperties sets CSS properties for the node, adding to and updating existing properties.
 func (n *Element) AddProperties(properties map[string]string) {
 	for key, value := range properties {
-		n.Properties[key] = value
+		n.SetProperty(key, value)
 	}
 }
 

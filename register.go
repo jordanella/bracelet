@@ -2,6 +2,7 @@ package bracelet
 
 func init() {
 	RegisterNode("text", &TextNode{})
+	RegisterNode("img", &ImgNode{})
 }
 
 // RegisterNode registers a custom node type for a specific HTML tag.

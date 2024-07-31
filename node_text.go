@@ -13,7 +13,7 @@ func (n TextNode) Create() NodeFactory {
 }
 
 func (n *TextNode) AddProperties(properties map[string]string) {
-	inherit := []string{"color", "font-weight", "text-transform", "text-align", "background-color", "width", "height"}
+	inherit := []string{"color", "font-weight", "text-transform", "text-align", "background-color", "width", "height", "word-spacing"}
 	parentProperties := (*n.GetParent()).GetProperties()
 
 	for key, value := range properties {

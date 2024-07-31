@@ -478,7 +478,10 @@ func PropIndent(value string) PropertyFunction {
 // PropWordSpacing returns a PropertyFunction that sets the spacing between words.
 func PropWordSpacing(value string) PropertyFunction {
 	return func(content string, style lipgloss.Style) (string, lipgloss.Style) {
-		spacing, _ := strconv.Atoi(value)
+		spacing, err := strconv.Atoi(value)
+		if err != nil {
+			spacing = 1
+		}
 		content = strings.Join(strings.Split(content, " "), strings.Repeat(" ", spacing))
 		return content, style
 	}

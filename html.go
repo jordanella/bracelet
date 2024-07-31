@@ -16,8 +16,8 @@ func ParseHTML(htmlContent string) (Node, error) {
 		return nil, fmt.Errorf("html.Parse error: %v", err)
 	}
 
-	var buildTree func(*html.Node) (Node, error)
-	buildTree = func(n *html.Node) (Node, error) {
+	var buildTree func(*html.Node, int, int) (Node, error)
+	buildTree = func(n *html.Node, totalSiblings, childIndex int) (Node, error) {
 		if n == nil {
 			return nil, fmt.Errorf("nil html.Node encountered")
 		}
@@ -37,8 +37,13 @@ func ParseHTML(htmlContent string) (Node, error) {
 				}
 			}
 
-			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				child, err := buildTree(c)
+			childCount := 0
+			for temp := n.FirstChild; temp != nil; temp = temp.NextSibling {
+				childCount++
+			}
+
+			for c, i := n.FirstChild, 0; c != nil; c, i = c.NextSibling, i+1 {
+				child, err := buildTree(c, childCount, i)
 				if err != nil {
 					return nil, fmt.Errorf("error building child node: %v", err)
 				}
@@ -50,9 +55,23 @@ func ParseHTML(htmlContent string) (Node, error) {
 			}
 			return node, nil
 		} else if n.Type == html.TextNode {
-			textContent := strings.TrimSpace(n.Data)
+			var textContent string
+
+			if childIndex == 0 {
+				textContent = strings.TrimLeft(n.Data, " \t\n\r")
+			}
+			if childIndex == totalSiblings-1 {
+				textContent = strings.TrimRight(n.Data, " \t\n\r")
+			}
+
 			if textContent != "" {
 				textNode := createNode("text")
+
+				// Remove duplicate spaces
+				for strings.Contains(textContent, "  ") {
+					textContent = strings.ReplaceAll(textContent, "  ", " ")
+				}
+
 				if textNode == nil {
 					return nil, fmt.Errorf("createNode returned nil for text element")
 				}
@@ -62,7 +81,7 @@ func ParseHTML(htmlContent string) (Node, error) {
 			return nil, nil
 		} else if n.Type == html.DocumentNode {
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				child, err := buildTree(c)
+				child, err := buildTree(c, totalSiblings, childIndex)
 				if err != nil {
 					return nil, fmt.Errorf("error building child node of document: %v", err)
 				}
@@ -74,7 +93,7 @@ func ParseHTML(htmlContent string) (Node, error) {
 		return nil, nil
 	}
 
-	rootNode, err := buildTree(doc)
+	rootNode, err := buildTree(doc, 0, 0)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build node tree: %v", err)
 	}
